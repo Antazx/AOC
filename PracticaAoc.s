@@ -5,6 +5,7 @@
 
 A: 	.asciiz "\nIntroduzca fecha(dd/mm/aaaa): \n"
 B: 	.asciiz "\n"
+Efma:	.asciiz "\nFormato de fecha incorrecto.\n"
 Emes:	.asciiz "\nEl mes introducido es incorrecto.\n"
 Edia:	.asciiz "\nEl dia introducido es incorrecto.\n"
 Eano:	.asciiz "\nEl año introducido es incorrecto.\n"
@@ -55,7 +56,9 @@ Meses: 	.asciiz "de Enero, de"
 	.globl __main
 
 __main:
-	
+		li $v0, 0
+		
+		
 		la $a0, A			#Pedimos la fecha por teclado
 		li $v0, 4
 		syscall
@@ -66,16 +69,25 @@ __main:
 		syscall
 
 		la $s0, cadena			#Inicializamos puntero a la cadena
-			
-		jal Dia				#Llamamos a la funcion para leer la cadena
+		
+		
+		jal Leer			#Llamamos a la funcion para leer la cadena
 
 		beq $v0, -1, ErrM		#Error Mes
 		beq $v0, -2, ErrD		#Error Dia
 		beq $v0, -3, ErrA		#Error Año
-		beq $v0, -4  ErrC
+		beq $v0, -4, ErrC		#Error Caracter
+		beq $v0, -5  ErrF		#Error Formato
+		
 	
 		li $v0, 10			#Terminamos
-		syscall	
+		syscall
+		
+ErrF:
+		la $a0, Efma
+		li $v0, 4
+		syscall
+		j __main
 
 ErrM:
 		la $a0, Emes			#Imprimimos mensaje de error
@@ -98,26 +110,28 @@ ErrC:
 		syscall
 		j __main
 		
-Dia:
+Leer:		
+		addi $t4, $t4, 1
 		lb $t0, 0($s0)			#Cargamos el caracter de la cadena
-		#errores branch
 		beq $t0, 47, Mes		#Si encontramos un / pasamos a leer el mes
-		blez $t0, ErrorCaracter
-		bgt $t0, 9, ErrorCaracter	
+		beq $t4, 3, ErrorFormato	
 		addi $t0, $t0, -48		#Restamos 48 para obtener el numero del ascii
+		bltz $t0, ErrorCaracter
+		bgt $t0, 9, ErrorCaracter 
 		mul $t1, $t1, 10		# x10 para ir calculando las decenas	
 		add $t1, $t1, $t0		
 		addi $s0, $s0, 1		#Sumamos 1 a la direccion de la cadena para leer el siguiente byte
-		j Dia				#Repetimos el bucle
+		j Leer			#Repetimos el bucle
 	
-Mes:	
+Mes:		
+		addi $t6 $t6, 1
 		addi $s0, $s0, 1		#Sumamos 1 a la direccion de la cadena para leer el siguiente byte
 		lb $t0, 0($s0)			#Cargamos el caracter de la cadena
-		#errores branch
 		beq $t0, 47, Year		#Si encontramos un / pasamos a leer el año
-		blez $t0, ErrorCaracter
-		bgt $t0, 9, ErrorCaracter				
+		beq $t4, 3, ErrorFormato				
 		addi $t0, $t0, -48		#Restamos 48 para obtener el numero del ascii
+		bltz $t0, ErrorCaracter
+		bgt $t0, 9, ErrorCaracter 
 		mul $t2, $t2, 10		# x10 para ir calculando las decenas
 		add $t2, $t2, $t0		
 		j Mes				#Repetimpos el bucle
@@ -125,18 +139,13 @@ Mes:
 Year:	
 		addi $s0, $s0, 1		#Sumamos 1 a la direccion de la cadena para leer el siguiente byte
 		lb $t0, 0($s0)			#Cargamos el caracter de la cadena
-		#errores branch
 		beq $t0, 0, Comprobar		#Si encontramos fin de cadena, terminamos de leer
-		blez $t0, ErrorCaracter
-		bgt $t0, 9, ErrorCaracter
 		addi $t0, $t0, -48		#Restamos 48 para obtener el numero del ascii
+		bltz $t0, ErrorCaracter
+		bgt $t0, 9, ErrorCaracter 
 		mul $t3, $t3, 10		# x10 para ir calculando las decenas las centenas y los millares
 		add $t3, $t3, $t0
 		j Year				#Repetimos el bucle
-
-
-
-
 
 Comprobar:
 		
@@ -214,7 +223,11 @@ ErrorCaracter:
 		li $v0, -4
 		j Salir
 
-Salir:
+ErrorFormato:
+		li $v0, -5
+		j Salir
+
+Salir:		
 		jr $ra 
 
 
