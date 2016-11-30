@@ -10,7 +10,8 @@ Emes:	.asciiz "\nEl mes introducido es incorrecto.\n"
 Edia:	.asciiz "\nEl dia introducido es incorrecto.\n"
 Eano:	.asciiz "\nEl anyo introducido es incorrecto.\n"
 Eca:	.asciiz "\nSe ha encontrado un caracter incorrecto\n"
-Err: 	.asciiz "\nAlgo ha salido regular\n"
+Err1: 	.asciiz "\nAlgo ha salido regular\n"
+Ealg:   .asciiz "\nHa habido un problema tecnico con el Algoritmo. Estamos trabajando en ello\n"
 
 cadena: .space 11 #Fecha leido
 
@@ -30,7 +31,7 @@ Semana:
 		.space 3
 		
 
-Meses: 		.asciiz "de Enero, de"
+Meses: 	.asciiz "de Enero, de"
 		.space 5
 		.asciiz "de Febrero, de"
 		.space 3
@@ -80,11 +81,33 @@ __main:
 		beq $v0, -3, ErrA		#Error anyo
 		beq $v0, -4, ErrC		#Error Caracter
 		beq $v0, -5  ErrF		#Error Formato
+
+		bltz $v0, ErrAlg
+		bgt  $v0, 7, Erraaaa
 		
+		la $s1, Semana
 		
+		mul $t5,$v0, 10
+		add $a0,$s1,$t5
+		
+		li $v0,4
+		syscall
 	
 		li $v0, 10			#Terminamos
 		syscall
+
+Erraaaa:	
+		la $a0, Err1
+		li $v0,4
+		syscall
+		j __main
+
+
+ErrAlg:
+		la $a0, Ealg
+		li $v0,4
+		syscall
+		j __main
 			
 ErrF:
 		la $a0, Efma
@@ -203,7 +226,7 @@ Bisiesto:
 
 		j Algoritmo
 
-Algoritmo:	
+Algoritmo:		#aplicamos la congruencia de zeller
 		ble $t2, 2, Ajuste
 		
 		li $t6, 12
@@ -251,6 +274,9 @@ Algoritmo:
 		li $t6, 7
 		div $t9, $t6
 		mfhi $t9
+
+		li $v0, 0
+		add $v0, $v0, $t9
 		
 		j Salir
 
