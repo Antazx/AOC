@@ -31,7 +31,7 @@ Semana:
 		.space 3
 		
 
-Meses: 	.asciiz "de Enero, de"
+Meses: 		.asciiz "de Enero, de"
 		.space 5
 		.asciiz "de Febrero, de"
 		.space 3
@@ -85,13 +85,28 @@ __main:
 		bltz $v0, ErrAlg
 		bgt  $v0, 7, Erraaaa
 		
-		la $s1, Semana
+		add $t4, $t4, $v0
 		
-		mul $t5,$v0, 10
+		la $a0, B  #imprimimos salto de linea
+		li $v0,4
+		syscall
+		
+		la $s1, Semana
+		mul $t5,$t4, 10 #imprimimos dia de la semana
 		add $a0,$s1,$t5
+		li $v0,4
+		syscall
+		
+		la $s1, Meses
+		addi $t2, $t2, -1
+		mul $t5, $t2, 18
+		add $a0, $s1, $t5
 		
 		li $v0,4
 		syscall
+		
+		
+		
 	
 		li $v0, 10			#Terminamos
 		syscall
