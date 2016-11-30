@@ -8,7 +8,7 @@ B: 	.asciiz "\n"
 Efma:	.asciiz "\nFormato de fecha incorrecto.\n"
 Emes:	.asciiz "\nEl mes introducido es incorrecto.\n"
 Edia:	.asciiz "\nEl dia introducido es incorrecto.\n"
-Eano:	.asciiz "\nEl año introducido es incorrecto.\n"
+Eano:	.asciiz "\nEl anyo introducido es incorrecto.\n"
 Eca:	.asciiz "\nSe ha encontrado un caracter incorrecto\n"
 Err: 	.asciiz "\nAlgo ha salido regular\n"
 
@@ -77,7 +77,7 @@ __main:
 
 		beq $v0, -1, ErrM		#Error Mes
 		beq $v0, -2, ErrD		#Error Dia
-		beq $v0, -3, ErrA		#Error Año
+		beq $v0, -3, ErrA		#Error anyo
 		beq $v0, -4, ErrC		#Error Caracter
 		beq $v0, -5  ErrF		#Error Formato
 		
@@ -130,7 +130,7 @@ Mes:
 		addi $t6 $t6, 1
 		addi $s0, $s0, 1		#Sumamos 1 a la direccion de la cadena para leer el siguiente byte
 		lb $t0, 0($s0)			#Cargamos el caracter de la cadena
-		beq $t0, 47, Year		#Si encontramos un / pasamos a leer el año
+		beq $t0, 47, Year		#Si encontramos un / pasamos a leer el anyo
 		bge $t6, 3, ErrorFormato				
 		addi $t0, $t0, -48		#Restamos 48 para obtener el numero del ascii
 		bltz $t0, ErrorCaracter
@@ -213,7 +213,7 @@ Algoritmo:
 		
 		mflo $t7		# a = (14 -mes) / 12
 		
-		sub $t8, $t3, $t7 	# y = año -a
+		sub $t8, $t3, $t7 	# y = anyo -a
 		
 		mul $t7, $t7, 12 	# a = 12 *a
 		add $t7, $t2, $t7	# a = a +mes
@@ -256,7 +256,7 @@ Algoritmo:
 
 Ajuste:		
 		addi $t2, $t2, 12	#mes +12
-		addi $t3, $t3, -1	#año -1
+		addi $t3, $t3, -1	#anyo -1
 		
 		j Algoritmo
 
@@ -268,7 +268,7 @@ ErrorDia:
 		li $v0, -2
 		j Salir
 		
-ErrorAño:	
+Erroranyo:	
 		li $v0, -3
 		j Salir
 		
