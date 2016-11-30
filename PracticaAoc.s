@@ -10,11 +10,14 @@ Emes:	.asciiz "\nEl mes introducido es incorrecto.\n"
 Edia:	.asciiz "\nEl dia introducido es incorrecto.\n"
 Eano:	.asciiz "\nEl año introducido es incorrecto.\n"
 Eca:	.asciiz "\nSe ha encontrado un caracter incorrecto\n"
-Ok: 	.asciiz "\nTodo va bien\n"
 Err: 	.asciiz "\nAlgo ha salido regular\n"
 
 cadena: .space 11 #Fecha leido
-Semana:	.asciiz "Lunes"
+
+Semana:		
+		.asciiz "Domingo"
+		.space 2
+		.asciiz "Lunes"
 		.space 4
 		.asciiz "Martes"
 		.space 3
@@ -25,10 +28,9 @@ Semana:	.asciiz "Lunes"
 		.space 2
 		.asciiz "Sabado"
 		.space 3
-		.asciiz "Domingo"
-		.space 2
+		
 
-Meses: 	.asciiz "de Enero, de"
+Meses: 		.asciiz "de Enero, de"
 		.space 5
 		.asciiz "de Febrero, de"
 		.space 3
@@ -79,10 +81,11 @@ __main:
 		beq $v0, -4, ErrC		#Error Caracter
 		beq $v0, -5  ErrF		#Error Formato
 		
+		
 	
 		li $v0, 10			#Terminamos
 		syscall
-		
+			
 ErrF:
 		la $a0, Efma
 		li $v0, 4
@@ -114,7 +117,7 @@ Leer:
 		addi $t4, $t4, 1
 		lb $t0, 0($s0)			#Cargamos el caracter de la cadena
 		beq $t0, 47, Mes		#Si encontramos un / pasamos a leer el mes
-		beq $t4, 3, ErrorFormato	
+		bge $t4, 3, ErrorFormato	
 		addi $t0, $t0, -48		#Restamos 48 para obtener el numero del ascii
 		bltz $t0, ErrorCaracter
 		bgt $t0, 9, ErrorCaracter 
@@ -128,7 +131,7 @@ Mes:
 		addi $s0, $s0, 1		#Sumamos 1 a la direccion de la cadena para leer el siguiente byte
 		lb $t0, 0($s0)			#Cargamos el caracter de la cadena
 		beq $t0, 47, Year		#Si encontramos un / pasamos a leer el año
-		beq $t4, 3, ErrorFormato				
+		bge $t6, 3, ErrorFormato				
 		addi $t0, $t0, -48		#Restamos 48 para obtener el numero del ascii
 		bltz $t0, ErrorCaracter
 		bgt $t0, 9, ErrorCaracter 
@@ -148,7 +151,7 @@ Year:
 		j Year				#Repetimos el bucle
 
 Comprobar:
-		
+	
 		bgt $t2, 12, ErrorMes
 		
 		beq $t2, 1, Mes31 #Enero
@@ -200,12 +203,62 @@ Bisiesto:
 
 		j Algoritmo
 
-Algoritmo:
-		la $a0, Ok			
-		li $v0, 4
-		syscall
-
+Algoritmo:	
+		ble $t2, 2, Ajuste
+		
+		li $t6, 12
+		
+		addi $t7, $t2, -14
+		div $t7, $t6
+		
+		mflo $t7		# a = (14 -mes) / 12
+		
+		sub $t8, $t3, $t7 	# y = año -a
+		
+		mul $t7, $t7, 12 	# a = 12 *a
+		add $t7, $t2, $t7	# a = a +mes
+		addi $t7, $t7, -2	# m= mes +12*a-2
+		
+		
+		mul $t7, $t7 31		
+		div $t7, $t6
+		mflo $t7		# m = 31*m /12
+		
+		li $t6, 4
+		
+		div $t8, $t6
+		mflo $t9		# resultado = y/4
+		
+		add $t9, $t1, $t9	# resultado = y/4 + dia
+		add $t9, $t8, $t9	# resultado = y/4 + dia + y
+		
+		add $t9, $t9, $t7	# resultado = y/4 + dia + y + 31*m /12
+		
+		li $t6, 100		
+		
+		div $t8, $t6
+		mflo $t7
+		
+		sub $t9, $t9, $t7
+		
+		li $t6, 400
+		
+		div $t8, $t6
+		mflo $t7
+		
+		add $t9, $t9, $t7	# resultado = y/4 + dia + y + 31*m /12 - y/100 + y/400
+		 
+		li $t6, 7
+		div $t9, $t6
+		mfhi $t9
+		
 		j Salir
+
+Ajuste:		
+		addi $t2, $t2, 12	#mes +12
+		addi $t3, $t3, -1	#año -1
+		
+		j Algoritmo
 
 ErrorMes:
 		li $v0, -1
@@ -228,6 +281,12 @@ ErrorFormato:
 		j Salir
 
 Salir:		
+		li $t1, 0
+		li $t2, 0
+		li $t3, 0
+		li $t4, 0
+		li $t5, 0
+		li $t6, 0
 		jr $ra 
 
 
