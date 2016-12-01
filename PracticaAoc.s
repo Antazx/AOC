@@ -87,33 +87,35 @@ __main:
 
 				bltz $v0, ErrAlg
 				bgt  $v0, 7, Erraaaa
-					
+				
+				add $s1, $zero, $v0
+				
 				la $a0, B			#Imprimimos salto de linea
 				li $v0, 4
 				syscall 
 						
 				la $a0, Semana			#Imprimimos dia de la semana
-				mul $t4, $v0, 11
+				mul $t4, $s1, 11
 				add $a0, $a0, $t4
 
 				li $v0, 4
 				syscall
 
 				li $a0, 0
-				add $a0, $a0, $t1
+				add $a0, $a0, $s2
 				li $v0, 1
 				syscall
 
 				la $a0, Meses
-				addi $t2, $t2, -1
-				mul $t2, $t2, 20
-				add $a0, $a0, $t2
+				addi $s3, $s3, -1
+				mul $s3, $s3, 20
+				add $a0, $a0, $s3
 
 				li $v0, 4
 				syscall
 						
 				li $a0, 0
-				add $a0, $a0, $t3
+				add $a0, $a0, $s4
 
 				li $v0, 1
 				syscall
@@ -204,8 +206,12 @@ Year:
 				add $t3, $t3, $t0
 				j Year				#Repetimos el bucle
 
-Comprobar:
-
+Comprobar:			
+				add $s2, $zero, $t1
+				add $s3, $zero, $t2
+				add $s4, $zero, $t3
+				
+				
 				bgt $t2, 12, ErrorMes
 
 				beq $t2, 1, Mes31 #Enero
