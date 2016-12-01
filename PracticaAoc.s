@@ -35,28 +35,28 @@ Semana:
 				.space 3
 
 Meses: 		
-				.asciiz "de Enero, de"
+				.asciiz " de Enero, de "
 				.space 5
-				.asciiz "de Febrero, de"
+				.asciiz " de Febrero, de "
 				.space 3
-				.asciiz "de Marzo, de"
+				.asciiz " de Marzo, de "
 				.space 5
-				.asciiz "de Abril, de"
+				.asciiz " de Abril, de "
 				.space 5
-				.asciiz "de Mayo, de"
+				.asciiz " de Mayo, de "
 				.space 6
-				.asciiz "de Junio, de"
+				.asciiz " de Junio, de "
 				.space 5
-				.asciiz "de Julio, de"
+				.asciiz " de Julio, de "
 				.space 5
-				.asciiz "de Agosto, de"
+				.asciiz " de Agosto, de "
 				.space 4
-				.asciiz "de Septiembre, de"
-				.asciiz "de Octubre, de"
+				.asciiz " de Septiembre, de "
+				.asciiz " de Octubre, de "
 				.space 3
-				.asciiz "de Noviembre, de"
+				.asciiz " de Noviembre, de "
 				.space 1
-				.asciiz "de Diciembre, de"
+				.asciiz " de Diciembre, de "
 				.space 1
 
 	.text
@@ -104,10 +104,10 @@ __main:
 				li $v0, 1
 				syscall
 
-				la $a0, Mes
-				#addi $t2, $t2, -1
-				#mul $t2, $t2, 18
-				#add $a0, $a0, $t2
+				la $a0, Meses
+				addi $t2, $t2, -1
+				mul $t2, $t2, 20
+				add $a0, $a0, $t2
 
 				li $v0, 4
 				syscall
@@ -342,3 +342,4 @@ Salir:
 				li $t5, 0
 				li $t6, 0
 				jr $ra
+
